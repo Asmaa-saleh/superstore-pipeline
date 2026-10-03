@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: dim_customers
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
+      - name: segment
+        tests:
+          - accepted_values:
+              values: ['Consumer', 'Corporate', 'Home Office']
+
+  - name: dim_products
+    columns:
+      - name: product_id
+        tests: [unique, not_null]
+      - name: category
+        tests:
+          - accepted_values:
+              values: ['Furniture', 'Office Supplies', 'Technology']
+
+  - name: dim_geography
+    columns:
+      - name: geography_key
+        tests: [unique, not_null]
+
+  - name: dim_date
+    columns:
+      - name: date_day
+        tests: [unique, not_null]
+
+  - name: fct_sales
+    description: Order-line fact table.
+    columns:
+      - name: sales_line_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests:
+          - relationships: {to: ref('dim_customers'), field: customer_id}
+      - name: product_id
+        tests:
+          - relationships: {to: ref('dim_products'), field: product_id}
+      - name: geography_key
+        tests:
+          - relationships: {to: ref('dim_geography'), field: geography_key}
+      - name: order_date
+        tests:
+          - relationships: {to: ref('dim_date'), field: date_day}
+      - name: ship_date
+        tests:
+          - relationships: {to: ref('dim_date'), field: date_day}
+
+  - name: mart_monthly_sales
+    columns:
+      - name: total_sales
+        tests: [not_null]

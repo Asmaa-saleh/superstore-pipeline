@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: superstore
+        description: Superstore order lines, loaded as-is from Superstore.xlsx

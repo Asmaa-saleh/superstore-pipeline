@@ -1,0 +1,4 @@
+dbt-core>=1.9,<1.10
+dbt-duckdb>=1.9,<1.10
+pandas>=2.2
+openpyxl>=3.1

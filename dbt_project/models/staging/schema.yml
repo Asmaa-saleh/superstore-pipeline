@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_superstore
+    description: Cleaned order lines, one row per row_id.
+    columns:
+      - name: row_id
+        tests: [unique, not_null]
+      - name: order_id
+        tests: [not_null]
+      - name: customer_id
+        tests: [not_null]
+      - name: product_id
+        tests: [not_null]
+      - name: order_date
+        tests: [not_null]

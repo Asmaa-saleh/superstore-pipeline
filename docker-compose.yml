@@ -1,0 +1,43 @@
+services:
+  airflow:
+    build: .
+    image: superstore-airflow:latest
+    user: "${AIRFLOW_UID:-50000}:0"
+    ports:
+      - "8080:8080"
+    environment:
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////opt/airflow/db/airflow.db
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY:-change-me-please}
+      AIRFLOW__WEBSERVER__WORKERS: "1"
+      AIRFLOW__WEBSERVER__WEB_SERVER_MASTER_TIMEOUT: "600"
+      # pipeline settings
+      SOURCE_FILE: /opt/airflow/data/Superstore.xlsx
+      DUCKDB_PATH: /opt/airflow/warehouse/superstore.duckdb
+      # dbt settings
+      DBT_PROFILES_DIR: /opt/airflow/dbt_project
+      DBT_TARGET_PATH: /tmp/dbt_target
+      DBT_LOG_PATH: /tmp/dbt_logs
+      DBT_SEND_ANONYMOUS_USAGE_STATS: "False"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./dbt_project:/opt/airflow/dbt_project
+      - ./data:/opt/airflow/data
+      - ./warehouse:/opt/airflow/warehouse
+      - airflow_db:/opt/airflow/db
+    command: >
+      bash -c "
+      airflow db migrate &&
+      (airflow users create --username ${AIRFLOW_ADMIN_USER:-admin}
+        --password ${AIRFLOW_ADMIN_PASSWORD:-admin}
+        --firstname Admin --lastname User --role Admin
+        --email admin@example.com || true) &&
+      (airflow scheduler &) &&
+      exec airflow webserver --port 8080
+      "
+
+volumes:
+  airflow_db:

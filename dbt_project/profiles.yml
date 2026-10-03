@@ -1,0 +1,7 @@
+superstore:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', '/opt/airflow/warehouse/superstore.duckdb') }}"
+      threads: 1
